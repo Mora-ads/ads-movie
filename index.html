@@ -7,143 +7,133 @@
     <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: linear-gradient(135deg, #4361ee, #7209b7);
-            --secondary: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-            --accent: #f1c40f;
-            --glass: rgba(255, 255, 255, 0.95);
+            --primary: linear-gradient(135deg, #4834d4, #686de0);
+            --secondary: #ff7979;
+            --accent: #f9ca24;
+            --white: #ffffff;
+            --bg: #f0f2f5;
         }
 
         body {
             font-family: 'Pyidaungsu', sans-serif;
-            background: #f0f2f5;
+            background: var(--bg);
             margin: 0;
             display: flex;
             justify-content: center;
             min-height: 100vh;
-            color: #2d3436;
         }
 
         .app-container {
             width: 100%;
-            max-width: 420px;
-            background: white;
+            max-width: 414px;
+            background: var(--white);
             min-height: 100vh;
-            position: relative;
+            display: flex;
+            flex-direction: column;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
         /* Header UI */
         .header {
             background: var(--primary);
-            padding: 40px 20px;
+            padding: 50px 20px;
             border-radius: 0 0 30px 30px;
             color: white;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
         }
 
         .balance-card {
-            background: var(--glass);
-            margin: -30px 20px 20px 20px;
-            padding: 20px;
+            background: white;
+            margin: -40px 20px 20px 20px;
+            padding: 25px;
             border-radius: 20px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         }
 
-        .coin-val {
-            font-size: 45px;
-            font-weight: 900;
-            color: #f39c12;
-            text-shadow: 1px 1px 0px #fff;
-        }
+        .coin-label { font-size: 14px; color: #95afc0; font-weight: bold; }
+        .coin-val { font-size: 55px; font-weight: 900; color: var(--accent); margin: 5px 0; }
 
-        /* Input & Button Styling */
-        .content { padding: 20px; }
-        
-        .section-title {
+        /* Ads Button UI */
+        .btn-ad {
+            background: #eb4d4b;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        .btn-ad:active { transform: scale(0.98); }
+
+        #timer-box {
+            display: none;
+            color: #eb4d4b;
             font-weight: bold;
             font-size: 16px;
-            margin: 20px 0 10px 5px;
-            display: flex;
-            align-items: center;
+            padding: 15px;
+            border: 2px dashed #eb4d4b;
+            border-radius: 15px;
+            margin-top: 10px;
         }
+
+        /* Withdrawal Section UI */
+        .content { padding: 25px; flex-grow: 1; }
+        .section-title { font-weight: bold; font-size: 18px; margin-bottom: 15px; color: #2f3542; }
 
         input, select {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             margin-bottom: 12px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid #dcdde1;
             border-radius: 12px;
-            font-size: 14px;
+            font-size: 15px;
             box-sizing: border-box;
-            background: #fafafa;
-        }
-
-        button {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-ad {
-            background: var(--secondary);
-            color: #d63384;
-            border: 2px solid #ff9a9e;
-            margin-bottom: 25px;
+            background: #f9f9f9;
         }
 
         .btn-withdraw {
             background: var(--primary);
             color: white;
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.2);
-        }
-
-        #timer-box {
-            display: none;
-            color: #e74c3c;
+            border: none;
+            padding: 18px;
+            border-radius: 15px;
+            font-size: 16px;
             font-weight: bold;
-            background: #fff5f5;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 15px;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(72, 52, 212, 0.3);
         }
 
         .hidden { display: none; }
-        
-        .footer-text {
-            font-size: 12px;
-            color: #a0a0a0;
-            text-align: center;
-            margin-top: 20px;
-        }
+        .logout-btn { color: #ff7979; border: none; background: none; margin-top: 20px; font-size: 14px; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <div id="auth-section" style="padding: 50px 30px;">
-            <h2 style="text-align: center; color: #4361ee;">Welcome</h2>
-            <p style="text-align: center; color: #636e72; font-size: 14px;">အကောင့်ဝင်ရန် Email နှင့် Password ရိုက်ထည့်ပါ</p>
+        <div id="auth-section" style="padding: 60px 30px; text-align: center;">
+            <h1 style="color: #4834d4;">Join Us</h1>
+            <p style="color: #95afc0;">Ads ကြည့်ပြီး Coin ရှာရန် အကောင့်ဝင်ပါ</p>
             <input type="email" id="email" placeholder="Email Address">
             <input type="password" id="password" placeholder="Password (Min 8 chars)">
-            <button class="btn-withdraw" onclick="handleAuth()">Login / Register</button>
+            <button class="btn-withdraw" onclick="handleAuth()">အကောင့်ဝင်မည် / ဖွင့်မည်</button>
         </div>
 
         <div id="main-app" class="hidden">
             <div class="header">
-                <h2 style="margin:0;">Earn Coins</h2>
-                <small style="opacity:0.8;">Ads ကြည့်ပြီး ပိုက်ဆံရှာပါ</small>
+                <h2 style="margin:0;">Earn Coins Official</h2>
+                <small style="opacity:0.8;">ယုံကြည်စိတ်ချစွာ အသုံးပြုနိုင်ပါသည်</small>
             </div>
 
             <div class="balance-card">
-                <small style="color:#636e72; font-weight: bold;">လက်ကျန် Coins</small>
+                <div class="coin-label">လက်ကျန် COINS</div>
                 <div class="coin-val" id="coinDisplay">0</div>
+                
                 <div id="timer-box">⏳ Ads ကြည့်နေသည်... <span id="seconds">15</span>s</div>
                 <button id="adBtn" class="btn-ad" onclick="watchAd()">📺 Ads ကြည့်ပြီး 5 Coins ယူမည်</button>
             </div>
@@ -161,12 +151,10 @@
                 <input type="number" id="withdrawAmount" placeholder="ထုတ်ယူမည့်ပမာဏ (Min 1000)">
                 <button class="btn-withdraw" onclick="requestWithdraw()">ငွေထုတ်ယူမည်</button>
                 
-                <div class="footer-text">
-                    အနည်းဆုံး ၁၀၀၀ Coins ပြည့်မှ ငွေထုတ်ယူနိုင်ပါသည်။<br>
-                    ငွေထုတ်ရန် ၂၄ နာရီအတွင်း ဆောင်ရွက်ပေးပါမည်။
-                </div>
-                
-                <button style="background:none; color:#ff7675; margin-top:20px; font-size: 13px;" onclick="logout()">Logout ထွက်မည်</button>
+                <button class="logout-btn" onclick="logout()">Account မှ ထွက်မည် (Logout)</button>
+                <p style="font-size: 11px; color: #95afc0; text-align: center; margin-top: 20px;">
+                    * အနည်းဆုံး ၁၀၀၀ Coins ပြည့်လျှင် ငွေထုတ်နိုင်ပါသည်။
+                </p>
             </div>
         </div>
     </div>
@@ -179,8 +167,8 @@
         const databases = new Databases(client);
 
         const DB_ID = '6990a481001f67225b44';
-        const USERS_COL = 'ip_404';
-        const NOTI_COL = 'admin_notifications';
+        const USERS_COL = 'ip_404'; // Screenshot [11] အရ
+        const NOTI_COL = 'admin_notifications'; // Screenshot [11] အရ
 
         let currentDocId = "";
         let userEmail = "";
@@ -224,7 +212,7 @@
             const timerDiv = document.getElementById('timer-box');
             const secSpan = document.getElementById('seconds');
             
-            btn.classList.add('hidden');
+            btn.style.display = 'none';
             timerDiv.style.display = 'block';
             let timeLeft = 15;
 
@@ -234,14 +222,14 @@
                 if (timeLeft <= 0) {
                     clearInterval(countdown);
                     timerDiv.style.display = 'none';
-                    btn.classList.remove('hidden');
+                    btn.style.display = 'block';
                     try {
                         const res = await databases.getDocument(DB_ID, USERS_COL, currentDocId);
                         let newBal = (res.balance || 0) + 5;
                         await databases.updateDocument(DB_ID, USERS_COL, currentDocId, { balance: newBal });
                         document.getElementById('coinDisplay').innerText = newBal;
                         alert("ဂုဏ်ယူပါတယ်။ 5 Coins ရရှိပါပြီ။");
-                    } catch (e) { alert("Error: Appwrite Platform Settings တွင် Hostname ထည့်ရန် လိုအပ်ပါသည်။"); }
+                    } catch (e) { alert("Error: Appwrite Platform Settings ပြန်စစ်ပါ။"); }
                 }
             }, 1000);
         }
@@ -257,15 +245,15 @@
 
             try {
                 await databases.createDocument(DB_ID, NOTI_COL, ID.unique(), {
-                    message: `📩 ငွေထုတ်ရန်: ${userEmail} မှ ${amt} Coins ကို ${op} (${ph}) ဖြင့် ထုတ်ယူလိုပါသည်။`,
+                    message: `💰 ငွေထုတ်ရန်: ${userEmail} မှ ${amt} Coins ကို ${op} (${ph}) ဖြင့် တောင်းဆိုထားပါသည်။`,
                     status: "unread",
                     createdAt: new Date().toISOString()
                 });
                 const newBal = currentBal - amt;
                 await databases.updateDocument(DB_ID, USERS_COL, currentDocId, { balance: newBal });
                 document.getElementById('coinDisplay').innerText = newBal;
-                alert("ငွေထုတ်တောင်းဆိုမှု အောင်မြင်ပါသည်။");
-            } catch (e) { alert("ငွေထုတ်ရန် အဆင်မပြေပါ။ Admin Notifications Collection ကို အရင်ဆောက်ပေးပါ။"); }
+                alert("ငွေထုတ်တောင်းဆိုမှု အောင်မြင်ပါသည်။ Admin မှ စစ်ဆေးပြီး ပို့ပေးပါမည်။");
+            } catch (e) { alert("Error: admin_notifications collection အား Appwrite တွင် အရင်ဆောက်ပေးပါ။"); }
         }
 
         async function logout() { await account.deleteSession('current'); location.reload(); }
