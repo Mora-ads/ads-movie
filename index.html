@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earn Coins - Premium UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            --success-gradient: linear-gradient(135deg, #84fb95 0%, #09adfe 100%);
+            --white: #ffffff;
+            --text-dark: #2d3436;
+        }
+
+        body {
+            font-family: 'Pyidaungsu', sans-serif;
+            background: #f0f3f7;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+
+        .card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            margin: 15px;
+        }
+
+        h2, h3, h4 { margin-top: 0; color: #4834d4; }
+
+        /* Input Styling */
+        input, select {
+            width: 90%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid #edf2f7;
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus { border-color: #667eea; }
+
+        /* Button Styling with Effects */
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .btn-auth { background: var(--primary-gradient); }
+        .btn-ad { background: var(--secondary-gradient); color: #fff; }
+        .btn-withdraw { background: var(--success-gradient); }
+        .btn-logout { 
+            background: transparent; 
+            color: #ff7675; 
+            border: 2px solid #ff7675;
+            margin-top: 25px;
+        }
+
+        /* Coin Display Effect */
+        .coin-box {
+            background: #fff9e6;
+            padding: 20px;
+            border-radius: 18px;
+            margin: 20px 0;
+            border: 2px dashed #f1c40f;
+        }
+
+        .coin-val {
+            font-size: 48px;
+            background: -webkit-linear-gradient(#f1c40f, #f39c12);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+        }
+
+        .hidden { display: none; }
+        
+        /* Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+
+    </style>
+</head>
+<body>
+
+    <div id="auth-section" class="card">
+        <h2 id="auth-title">Welcome Back</h2>
+        <p style="color: #636e72; font-size: 14px;">ဆက်လက်လုပ်ဆောင်ရန် Login ဝင်ပါ</p>
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="password" placeholder="Password (Min 8 chars)">
+        <button class="btn-auth" id="auth-btn" onclick="handleAuth()">Login ဝင်မည်</button>
+        <button style="background:none; color:#667eea; box-shadow:none; border:none;" onclick="toggleAuthMode()" id="toggle-link">အကောင့်အသစ်ဖွင့်ရန်</button>
+    </div>
+
+    <div id="main-app" class="card hidden">
+        <h3 class="animate-float">💰 My Balance</h3>
+        <div class="coin-box">
+            <div class="coin-val" id="coinDisplay">0</div>
+            <span style="color: #f39c12; font-weight: bold;">COINS</span>
+        </div>
+        <p id="user-info" style="font-size: 12px; color: #b2bec3;"></p>
+        
+        <button class="btn-ad" onclick="watchAd()">📺 Ads ကြည့်ပြီး 5 Coins ယူမည်</button>
+
+        <div style="margin-top: 30px; text-align: left;">
+            <h4 style="margin-bottom: 5px;">💸 Withdraw Payment</h4>
+            <select id="operator">
+                <option>MPT</option>
+                <option>ATOM</option>
+                <option>Ooredoo</option>
+                <option>MyTel</option>
+                <option>KPay</option>
+                <option>Wave Pay</option>
+            </select>
+            <input type="text" id="targetPhone" placeholder="Phone Number (09...)">
+            <input type="number" id="withdrawAmount" placeholder="Amount (Min 1000)">
+            <button class="btn-withdraw" onclick="requestWithdraw()">ငွေထုတ်ရန် တောင်းဆိုမည်</button>
+        </div>
+        
+        <button class="btn-logout" onclick="logout()">Logout Account</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+    <script>
+        const { Client, Account, Databases, ID, Query } = Appwrite;
+        const client = new Client().setEndpoint('https://sgp.cloud.appwrite.io/v1').setProject('6990a457003d6b0bbf82'); 
+        const account = new Account(client);
+        const databases = new Databases(client);
+        const DB_ID = '6990a481001f67225b44'; 
+        const USERS_COL = 'ip_404';
+
+        let isLoginMode = true;
+        let currentDocId = "";
+        let userEmail = "";
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').innerText = isLoginMode ? "Welcome Back" : "Join Us Now";
+            document.getElementById('auth-btn').innerText = isLoginMode ? "Login ဝင်မည်" : "အကောင့်ဖွင့်မည်";
+            document.getElementById('toggle-link').innerText = isLoginMode ? "အကောင့်အသစ်ဖွင့်ရန်" : "အကောင့်ရှိပြီးသားဆိုလျှင် Login ဝင်ရန်";
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            if (!email || pass.length < 8) return alert("Email နှင့် Password ကို မှန်ကန်စွာ ဖြည့်ပါ။");
+            try {
+                if (isLoginMode) { await account.createEmailSession(email, pass); } 
+                else { await account.create(ID.unique(), email, pass); await account.createEmailSession(email, pass); }
+                location.reload();
+            } catch (e) { alert("Error: " + e.message); }
+        }
+
+        async function checkSession() {
+            try {
+                const user = await account.get();
+                userEmail = user.email;
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('user-info').innerText = "Logged as: " + userEmail;
+                
+                const res = await databases.listDocuments(DB_ID, USERS_COL, [Query.equal("phone", userEmail)]);
+                if (res.documents.length > 0) {
+                    currentDocId = res.documents[0].$id;
+                    document.getElementById('coinDisplay').innerText = res.documents[0].balance;
+                } else {
+                    const newDoc = await databases.createDocument(DB_ID, USERS_COL, ID.unique(), {
+                        phone: userEmail, username: userEmail.split('@')[0], balance: 0
+                    });
+                    currentDocId = newDoc.$id;
+                }
+            } catch (e) { }
+        }
+
+        async function requestWithdraw() {
+            const amt = parseInt(document.getElementById('withdrawAmount').value);
+            const ph = document.getElementById('targetPhone').value;
+            const op = document.getElementById('operator').value;
+            const currentBal = parseInt(document.getElementById('coinDisplay').innerText);
+
+            if (!ph || !amt || amt < 1000) return alert("အချက်အလက်များကို မှန်ကန်စွာ ဖြည့်ပါ။ (အနည်းဆုံး ၁၀၀၀)");
+            if (currentBal < amt) return alert("Coin မလုံလောက်ပါ။");
+
+            try {
+                await databases.createDocument(DB_ID, 'withdrawals', ID.unique(), { email: userEmail, amount: amt, phone: ph, operator: op });
+                await databases.createDocument(DB_ID, 'admin_notifications', ID.unique(), {
+                    message: `🔔 Withdraw Request: ${userEmail} | ${amt} Coins | ${ph} (${op})`, status: "unread"
+                });
+                const newBal = currentBal - amt;
+                await databases.updateDocument(DB_ID, USERS_COL, currentDocId, { balance: newBal });
+                document.getElementById('coinDisplay').innerText = newBal;
+                alert("ငွေထုတ်တောင်းဆိုမှု အောင်မြင်သည်။");
+            } catch (e) { alert("Error: " + e.message); }
+        }
+
+        async function watchAd() {
+            window.open('https://www.effectivegatecpm.com/cjs2qkq14?key=e00a213c35437a8d9347baef32b83bd8', '_blank');
+            alert("၁၅ စက္ကန့် စောင့်ပေးပါ။");
+            setTimeout(async () => {
+                let bal = parseInt(document.getElementById('coinDisplay').innerText) + 5;
+                await databases.updateDocument(DB_ID, USERS_COL, currentDocId, { balance: bal });
+                document.getElementById('coinDisplay').innerText = bal;
+                alert("5 Coins ရရှိပါပြီ။");
+            }, 15000);
+        }
+
+        async function logout() { await account.deleteSession('current'); location.reload(); }
+        checkSession();
+    </script>
+</body>
+</html>

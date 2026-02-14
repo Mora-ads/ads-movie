@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Earn Coins</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f7fe;
+            --primary-gradient: linear-gradient(135deg, #4361ee, #7209b7);
+            --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        body {
+            font-family: 'Pyidaungsu', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: #2d3436;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Header UI */
+        .header {
+            background: var(--primary-gradient);
+            padding: 25px;
+            border-radius: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
+        }
+
+        .header h2 { margin: 0; font-size: 20px; letter-spacing: 0.5px; }
+
+        /* Card Styling */
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 18px;
+            margin-bottom: 15px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
+
+        /* Unread Effect */
+        .card.unread {
+            border-left: 6px solid #f72585;
+            background: #fffcfd;
+        }
+
+        .card.read { border-left: 6px solid #4cc9f0; }
+
+        .msg { font-size: 15px; line-height: 1.6; margin-bottom: 12px; font-weight: 500; }
+        .time { font-size: 12px; color: #a2a2a2; display: flex; align-items: center; }
+
+        /* Button UI */
+        button {
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-refresh {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-refresh:hover { background: rgba(255,255,255,0.3); }
+
+        .btn-done {
+            background: #4cc9f0;
+            color: white;
+            padding: 8px 18px;
+            font-size: 13px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
+        }
+
+        .btn-done:hover { background: #4361ee; }
+
+        .status-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .tag-unread { background: #ffeef2; color: #f72585; }
+        .tag-read { background: #eefbff; color: #4cc9f0; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h2>📊 Admin Dashboard</h2>
+            <small style="opacity: 0.8;">ငွေထုတ်ရန် တောင်းဆိုမှုများ</small>
+        </div>
+        <button class="btn-refresh" onclick="loadData()">Refresh</button>
+    </div>
+
+    <div id="list">
+        <p style="text-align:center; color:#95a5a6; margin-top: 50px;">စာရင်းများကို စစ်ဆေးနေသည်...</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+<script>
+    const { Client, Databases, Query } = Appwrite;
+    const client = new Client().setEndpoint('https://sgp.cloud.appwrite.io/v1').setProject('6990a457003d6b0bbf82');
+    const databases = new Databases(client);
+    const DB_ID = '6990a481001f67225b44';
+    const NOTI_COL = 'admin_notifications';
+
+    async function loadData() {
+        try {
+            const res = await databases.listDocuments(DB_ID, NOTI_COL, [Query.orderDesc("$createdAt")]);
+            const listDiv = document.getElementById('list');
+            listDiv.innerHTML = res.documents.length ? "" : "<div style='text-align:center; padding: 50px; color:#95a5a6;'>တောင်းဆိုမှု မရှိသေးပါ။</div>";
+
+            res.documents.forEach(doc => {
+                const card = document.createElement('div');
+                card.className = `card ${doc.status === 'unread' ? 'unread' : 'read'}`;
+                const time = new Date(doc.$createdAt).toLocaleString();
+                
+                card.innerHTML = `
+                    <span class="status-tag ${doc.status === 'unread' ? 'tag-unread' : 'tag-read'}">
+                        ${doc.status === 'unread' ? 'အသစ်' : 'စစ်ဆေးပြီး'}
+                    </span>
+                    <div class="msg">${doc.message}</div>
+                    <div class="time">🕒 ${time}</div>
+                    ${doc.status === 'unread' ? `<button class="btn-done" onclick="markRead('${doc.$id}')">စစ်ဆေးပြီးပြီဟု မှတ်သားရန်</button>` : ''}
+                `;
+                listDiv.appendChild(card);
+            });
+        } catch (e) { 
+            console.error(e);
+            alert("Error: Collection ရှာမတွေ့ပါ။ Dashboard မှာ admin_notifications ကို အရင်ဆောက်ပေးပါ။"); 
+        }
+    }
+
+    async function markRead(id) {
+        try {
+            await databases.updateDocument(DB_ID, NOTI_COL, id, { status: "read" });
+            loadData();
+        } catch (e) { alert(e.message); }
+    }
+
+    loadData();
+</script>
+</body>
+</html>
