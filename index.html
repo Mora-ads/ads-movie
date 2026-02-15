@@ -21,11 +21,14 @@
         .header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
         .header p { opacity: 0.9; font-size: 14px; margin-top: 5px; }
 
+        /* Auth Section */
+        #auth-section { padding: 60px 30px; text-align: center; }
+        .auth-toggle { margin-top: 20px; font-size: 14px; color: #686de0; cursor: pointer; text-decoration: underline; }
+
         /* Balance Card */
         .balance-card { background: white; margin: -40px 20px 20px 20px; padding: 25px; border-radius: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .coin-val { font-size: 55px; font-weight: 900; color: var(--accent); margin: 10px 0; }
         
-        /* Admin Notice Inbox */
         #admin-notice { display: none; background: #fff3cd; color: #856404; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ffeeba; font-size: 13px; text-align: left; }
 
         /* Timer & Buttons */
@@ -36,7 +39,7 @@
         .content { padding: 25px; }
         .section-title { font-weight: bold; font-size: 18px; margin-bottom: 15px; color: #2f3542; }
         input, select { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #dcdde1; border-radius: 12px; box-sizing: border-box; background: #f9f9f9; font-size: 15px; }
-        .btn-withdraw { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
+        .btn-withdraw { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; margin-top: 5px; }
 
         .hidden { display: none; }
         .logout-btn { color: #ff7979; border: none; background: none; margin-top: 25px; cursor: pointer; width: 100%; font-size: 14px; }
@@ -45,12 +48,17 @@
 <body>
 
     <div class="app-container">
-        <div id="auth-section" style="padding: 60px 30px; text-align: center;">
-            <h1 style="color: #4834d4;">Login to Earn</h1>
-            <p style="color: #95afc0;">အကောင့်ဝင်ပြီး Coins များ စုဆောင်းပါ</p>
+        <div id="auth-section">
+            <h1 id="auth-title" style="color: #4834d4;">Login to Earn</h1>
+            <p id="auth-desc" style="color: #95afc0;">အကောင့်ဝင်ပြီး Coins များ စုဆောင်းပါ</p>
+            
             <input type="email" id="email" placeholder="Email Address">
             <input type="password" id="password" placeholder="Password (Min 8 chars)">
-            <button class="btn-withdraw" onclick="handleAuth()">အကောင့်ဝင်မည်</button>
+            
+            <button id="loginBtn" class="btn-withdraw" onclick="handleLogin()">အကောင့်ဝင်မည်</button>
+            <button id="signupBtn" class="btn-withdraw hidden" onclick="handleSignUp()">အကောင့်သစ်ဖွင့်မည်</button>
+            
+            <p class="auth-toggle" id="toggleText" onclick="toggleAuth()">အကောင့်မရှိသေးပါက ဤနေရာတွင် အကောင့်ဖွင့်ပါ</p>
         </div>
 
         <div id="main-app" class="hidden">
@@ -101,16 +109,39 @@
 
         let currentDocId = "";
         let userEmail = "";
+        let isSignUpMode = false;
 
-        async function handleAuth() {
+        // Login နဲ့ Sign Up ပြောင်းလဲဖို့
+        function toggleAuth() {
+            isSignUpMode = !isSignUpMode;
+            document.getElementById('auth-title').innerText = isSignUpMode ? "Sign Up to Earn" : "Login to Earn";
+            document.getElementById('auth-desc').innerText = isSignUpMode ? "အကောင့်သစ်ဖွင့်ပြီး Coins များ စုဆောင်းပါ" : "အကောင့်ဝင်ပြီး Coins များ စုဆောင်းပါ";
+            document.getElementById('loginBtn').classList.toggle('hidden');
+            document.getElementById('signupBtn').classList.toggle('hidden');
+            document.getElementById('toggleText').innerText = isSignUpMode ? "အကောင့်ရှိပြီးသားဖြစ်ပါက ဤနေရာတွင် Login ဝင်ပါ" : "အကောင့်မရှိသေးပါက ဤနေရာတွင် အကောင့်ဖွင့်ပါ";
+        }
+
+        // Login လုပ်ဆောင်ချက်
+        async function handleLogin() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
             if(!email || pass.length < 8) return alert("Email နှင့် Password (၈ လုံးအထက်) မှန်အောင်ဖြည့်ပါ။");
             try {
-                try { await account.create(ID.unique(), email, pass); } catch(e){}
                 await account.createEmailSession(email, pass);
                 location.reload();
-            } catch (e) { alert("Error: " + e.message); }
+            } catch (e) { alert("Login Error: " + e.message); }
+        }
+
+        // Sign Up လုပ်ဆောင်ချက်
+        async function handleSignUp() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            if(!email || pass.length < 8) return alert("Email နှင့် Password (၈ လုံးအထက်) မှန်အောင်ဖြည့်ပါ။");
+            try {
+                await account.create(ID.unique(), email, pass);
+                alert("အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။ ယခု Login ဝင်နိုင်ပါပြီ။");
+                toggleAuth(); // Login page သို့ ပြန်ပို့ရန်
+            } catch (e) { alert("Sign Up Error: " + e.message); }
         }
 
         async function checkSession() {
@@ -130,9 +161,7 @@
                     });
                     currentDocId = newDoc.$id;
                 }
-                
                 checkInbox();
-
             } catch (e) {}
         }
 
@@ -147,7 +176,6 @@
         }
 
         async function watchAd() {
-            // CPAGrip Locker Link အသစ်ဖြင့် အစားထိုးထားသည်
             const adsLink = 'https://optilinklock.com/1876200';
             window.open(adsLink, '_blank');
 
@@ -172,7 +200,7 @@
                         await databases.updateDocument(DB_ID, USERS_COL, currentDocId, { balance: newBal });
                         document.getElementById('coinDisplay').innerText = newBal;
                         alert("ဂုဏ်ယူပါတယ်။ 5 Coins ရရှိပါပြီ။");
-                    } catch (e) { alert("Error: Appwrite Platform မှာ Hostname ထည့်သွင်းပေးပါ။"); }
+                    } catch (e) { alert("Coin ထည့်သွင်းရန် အခက်အခဲရှိနေပါသည်။"); }
                 }
             }, 1000);
         }
