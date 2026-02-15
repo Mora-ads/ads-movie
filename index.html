@@ -79,7 +79,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
     <script>
-        // Initialization ကို အစီအစဉ်တကျ လုပ်ခြင်း
         const { Client, Account, Databases, ID, Query } = Appwrite;
         const client = new Client();
         client
@@ -106,14 +105,12 @@
             if(!email || pass.length < 8) return alert("Email နှင့် Password (၈ လုံးအထက်) မှန်အောင်ဖြည့်ပါ။");
             
             btn.classList.add('hidden');
-            loader.classList.remove('remove');
+            loader.classList.remove('hidden');
 
             try {
-                // အရင်ဆုံး Login ကြည့်မယ်
                 try {
                     await account.createEmailSession(email, pass);
                 } catch (loginError) {
-                    // Login မရရင် အကောင့်အသစ် ဖွင့်ကြည့်မယ်
                     await account.create(ID.unique(), email, pass);
                     await account.createEmailSession(email, pass);
                 }
@@ -143,9 +140,7 @@
                     currentDocId = newDoc.$id;
                 }
                 checkInbox();
-            } catch (e) {
-                console.log("No active session");
-            }
+            } catch (e) {}
         }
 
         async function checkInbox() {
@@ -159,14 +154,17 @@
         }
 
         async function watchAd() {
-            const adsLink = 'https://optilinklock.com/1876200';
+            // အသစ်ပေးထားသော Ads Link
+            const adsLink = 'https://www.effectivegatecpm.com/cjs2qkq14?key=e00a213c35437a8d9347baef32b83bd8';
             window.open(adsLink, '_blank');
+
             const btn = document.getElementById('adBtn');
             const timerDiv = document.getElementById('timer-box');
             const secSpan = document.getElementById('seconds');
             btn.style.display = 'none';
             timerDiv.style.display = 'block';
             let timeLeft = 15;
+            
             const countdown = setInterval(async () => {
                 timeLeft--;
                 secSpan.innerText = timeLeft;
@@ -206,8 +204,6 @@
         }
 
         async function logout() { await account.deleteSession('current'); location.reload(); }
-        
-        // App စတင်ပွင့်ချိန်မှာ Session စစ်ဆေးရန်
         window.onload = checkSession;
     </script>
 </body>
