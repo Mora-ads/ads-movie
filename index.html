@@ -16,32 +16,28 @@
         body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; min-height: 100vh; }
         .app-container { width: 100%; max-width: 414px; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); position: relative; }
 
-        /* Header UI */
         .header { background: var(--primary); padding: 50px 20px; border-radius: 0 0 35px 35px; color: white; text-align: center; }
         .header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
         .header p { opacity: 0.9; font-size: 14px; margin-top: 5px; }
 
-        /* Auth Section */
+        /* Auth Section UI */
         #auth-section { padding: 60px 30px; text-align: center; }
-        .auth-toggle { margin-top: 20px; font-size: 14px; color: #686de0; cursor: pointer; text-decoration: underline; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { font-size: 12px; color: #666; margin-left: 10px; }
 
-        /* Balance Card */
         .balance-card { background: white; margin: -40px 20px 20px 20px; padding: 25px; border-radius: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .coin-val { font-size: 55px; font-weight: 900; color: var(--accent); margin: 10px 0; }
         
         #admin-notice { display: none; background: #fff3cd; color: #856404; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ffeeba; font-size: 13px; text-align: left; }
 
-        /* Timer & Buttons */
         #timer-box { display: none; color: #eb4d4b; font-weight: bold; padding: 15px; border: 2px dashed #eb4d4b; border-radius: 15px; margin-top: 10px; }
         .btn-ad { background: #eb4d4b; color: white; border: none; padding: 18px; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; box-shadow: 0 5px 15px rgba(235, 77, 75, 0.3); }
 
-        /* Withdrawal Content */
         .content { padding: 25px; }
-        .section-title { font-weight: bold; font-size: 18px; margin-bottom: 15px; color: #2f3542; }
         input, select { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #dcdde1; border-radius: 12px; box-sizing: border-box; background: #f9f9f9; font-size: 15px; }
-        .btn-withdraw { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; margin-top: 5px; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; margin-top: 5px; }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .logout-btn { color: #ff7979; border: none; background: none; margin-top: 25px; cursor: pointer; width: 100%; font-size: 14px; }
     </style>
 </head>
@@ -49,16 +45,14 @@
 
     <div class="app-container">
         <div id="auth-section">
-            <h1 id="auth-title" style="color: #4834d4;">Login to Earn</h1>
-            <p id="auth-desc" style="color: #95afc0;">အကောင့်ဝင်ပြီး Coins များ စုဆောင်းပါ</p>
+            <h1 style="color: #4834d4;">Get Started</h1>
+            <p style="color: #95afc0;">အကောင့်မရှိပါက အလိုအလျောက် ဖွင့်ပေးပါမည်</p>
             
             <input type="email" id="email" placeholder="Email Address">
             <input type="password" id="password" placeholder="Password (Min 8 chars)">
             
-            <button id="loginBtn" class="btn-withdraw" onclick="handleLogin()">အကောင့်ဝင်မည်</button>
-            <button id="signupBtn" class="btn-withdraw hidden" onclick="handleSignUp()">အကောင့်သစ်ဖွင့်မည်</button>
-            
-            <p class="auth-toggle" id="toggleText" onclick="toggleAuth()">အကောင့်မရှိသေးပါက ဤနေရာတွင် အကောင့်ဖွင့်ပါ</p>
+            <button id="authBtn" class="btn-primary" onclick="handleAuth()">အကောင့်ဝင်ရန် / ဖွင့်ရန်</button>
+            <p id="loading-text" class="hidden" style="color: #686de0; margin-top: 10px;">⏳ ခဏစောင့်ပါ...</p>
         </div>
 
         <div id="main-app" class="hidden">
@@ -78,7 +72,7 @@
             </div>
 
             <div class="content">
-                <div class="section-title">💸 ငွေထုတ်ယူရန်</div>
+                <div style="font-weight: bold; margin-bottom: 10px;">💸 ငွေထုတ်ယူရန်</div>
                 <select id="operator">
                     <option value="KPay">KPay</option>
                     <option value="Wave Pay">Wave Pay</option>
@@ -88,7 +82,7 @@
                 </select>
                 <input type="text" id="targetPhone" placeholder="ဖုန်းနံပါတ် သို့မဟုတ် Wallet နံပါတ်">
                 <input type="number" id="withdrawAmount" placeholder="ထုတ်ယူမည့်ပမာဏ (Min 1000)">
-                <button class="btn-withdraw" onclick="requestWithdraw()">ငွေထုတ်ယူမည်</button>
+                <button class="btn-primary" onclick="requestWithdraw()">ငွေထုတ်ယူမည်</button>
                 
                 <button class="logout-btn" onclick="logout()">Logout (အကောင့်မှထွက်မည်)</button>
             </div>
@@ -109,39 +103,37 @@
 
         let currentDocId = "";
         let userEmail = "";
-        let isSignUpMode = false;
 
-        // Login နဲ့ Sign Up ပြောင်းလဲဖို့
-        function toggleAuth() {
-            isSignUpMode = !isSignUpMode;
-            document.getElementById('auth-title').innerText = isSignUpMode ? "Sign Up to Earn" : "Login to Earn";
-            document.getElementById('auth-desc').innerText = isSignUpMode ? "အကောင့်သစ်ဖွင့်ပြီး Coins များ စုဆောင်းပါ" : "အကောင့်ဝင်ပြီး Coins များ စုဆောင်းပါ";
-            document.getElementById('loginBtn').classList.toggle('hidden');
-            document.getElementById('signupBtn').classList.toggle('hidden');
-            document.getElementById('toggleText').innerText = isSignUpMode ? "အကောင့်ရှိပြီးသားဖြစ်ပါက ဤနေရာတွင် Login ဝင်ပါ" : "အကောင့်မရှိသေးပါက ဤနေရာတွင် အကောင့်ဖွင့်ပါ";
-        }
-
-        // Login လုပ်ဆောင်ချက်
-        async function handleLogin() {
+        // Sign Up နဲ့ Login ကို တစ်ခါတည်းလုပ်ပေးမယ့် Function
+        async function handleAuth() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
+            const btn = document.getElementById('authBtn');
+            const loader = document.getElementById('loading-text');
+
             if(!email || pass.length < 8) return alert("Email နှင့် Password (၈ လုံးအထက်) မှန်အောင်ဖြည့်ပါ။");
+            
+            btn.classList.add('hidden');
+            loader.classList.remove('hidden');
+
             try {
+                // အရင်ဆုံး အကောင့်အသစ် ဖွင့်ကြည့်မယ်
+                try {
+                    await account.create(ID.unique(), email, pass);
+                } catch (e) {
+                    // အကောင့်ရှိပြီးသားဆိုရင် ဒီအတိုင်း ကျော်သွားမယ်
+                    console.log("Account maybe exists, trying to login...");
+                }
+                
+                // Login ဝင်မယ်
                 await account.createEmailSession(email, pass);
                 location.reload();
-            } catch (e) { alert("Login Error: " + e.message); }
-        }
 
-        // Sign Up လုပ်ဆောင်ချက်
-        async function handleSignUp() {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
-            if(!email || pass.length < 8) return alert("Email နှင့် Password (၈ လုံးအထက်) မှန်အောင်ဖြည့်ပါ။");
-            try {
-                await account.create(ID.unique(), email, pass);
-                alert("အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။ ယခု Login ဝင်နိုင်ပါပြီ။");
-                toggleAuth(); // Login page သို့ ပြန်ပို့ရန်
-            } catch (e) { alert("Sign Up Error: " + e.message); }
+            } catch (error) {
+                alert("Error: " + error.message);
+                btn.classList.remove('hidden');
+                loader.classList.add('hidden');
+            }
         }
 
         async function checkSession() {
@@ -200,7 +192,7 @@
                         await databases.updateDocument(DB_ID, USERS_COL, currentDocId, { balance: newBal });
                         document.getElementById('coinDisplay').innerText = newBal;
                         alert("ဂုဏ်ယူပါတယ်။ 5 Coins ရရှိပါပြီ။");
-                    } catch (e) { alert("Coin ထည့်သွင်းရန် အခက်အခဲရှိနေပါသည်။"); }
+                    } catch (e) { alert("Error: Coin ထည့်၍မရပါ။"); }
                 }
             }, 1000);
         }
@@ -224,7 +216,7 @@
                 await databases.updateDocument(DB_ID, USERS_COL, currentDocId, { balance: newBal });
                 document.getElementById('coinDisplay').innerText = newBal;
                 alert("ငွေထုတ်တောင်းဆိုမှု အောင်မြင်သည်။ Admin မှ စစ်ဆေးပေးပါမည်။");
-            } catch (e) { alert("Error: admin_notifications table စစ်ဆေးပါ။"); }
+            } catch (e) { alert("Error: Admin Notification စနစ် ချို့ယွင်းနေပါသည်။"); }
         }
 
         async function logout() { await account.deleteSession('current'); location.reload(); }
