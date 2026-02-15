@@ -20,19 +20,14 @@
         .header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
         .header p { opacity: 0.9; font-size: 14px; margin-top: 5px; }
 
-        /* Auth Section UI */
         #auth-section { padding: 60px 30px; text-align: center; }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { font-size: 12px; color: #666; margin-left: 10px; }
-
         .balance-card { background: white; margin: -40px 20px 20px 20px; padding: 25px; border-radius: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .coin-val { font-size: 55px; font-weight: 900; color: var(--accent); margin: 10px 0; }
         
         #admin-notice { display: none; background: #fff3cd; color: #856404; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ffeeba; font-size: 13px; text-align: left; }
-
         #timer-box { display: none; color: #eb4d4b; font-weight: bold; padding: 15px; border: 2px dashed #eb4d4b; border-radius: 15px; margin-top: 10px; }
+        
         .btn-ad { background: #eb4d4b; color: white; border: none; padding: 18px; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; box-shadow: 0 5px 15px rgba(235, 77, 75, 0.3); }
-
         .content { padding: 25px; }
         input, select { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid #dcdde1; border-radius: 12px; box-sizing: border-box; background: #f9f9f9; font-size: 15px; }
         .btn-primary { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; margin-top: 5px; }
@@ -47,10 +42,8 @@
         <div id="auth-section">
             <h1 style="color: #4834d4;">Get Started</h1>
             <p style="color: #95afc0;">အကောင့်မရှိပါက အလိုအလျောက် ဖွင့်ပေးပါမည်</p>
-            
             <input type="email" id="email" placeholder="Email Address">
             <input type="password" id="password" placeholder="Password (Min 8 chars)">
-            
             <button id="authBtn" class="btn-primary" onclick="handleAuth()">အကောင့်ဝင်ရန် / ဖွင့်ရန်</button>
             <p id="loading-text" class="hidden" style="color: #686de0; margin-top: 10px;">⏳ ခဏစောင့်ပါ...</p>
         </div>
@@ -60,17 +53,13 @@
                 <h1>Earn Coins Official</h1>
                 <p>ယုံကြည်စိတ်ချစွာ Ads ကြည့်ပြီး ပိုက်ဆံရှာပါ</p>
             </div>
-
             <div class="balance-card">
                 <div id="admin-notice">📢 <b>Admin Notice:</b> <span id="msg-text"></span></div>
-                
                 <small style="color:#95afc0; font-weight: bold;">TOTAL BALANCE</small>
                 <div class="coin-val" id="coinDisplay">0</div>
-                
                 <div id="timer-box">⏳ Ads ကြည့်နေသည်... <span id="seconds">15</span>s</div>
                 <button id="adBtn" class="btn-ad" onclick="watchAd()">📺 Ads ကြည့်ပြီး 5 Coins ယူမည်</button>
             </div>
-
             <div class="content">
                 <div style="font-weight: bold; margin-bottom: 10px;">💸 ငွေထုတ်ယူရန်</div>
                 <select id="operator">
@@ -83,7 +72,6 @@
                 <input type="text" id="targetPhone" placeholder="ဖုန်းနံပါတ် သို့မဟုတ် Wallet နံပါတ်">
                 <input type="number" id="withdrawAmount" placeholder="ထုတ်ယူမည့်ပမာဏ (Min 1000)">
                 <button class="btn-primary" onclick="requestWithdraw()">ငွေထုတ်ယူမည်</button>
-                
                 <button class="logout-btn" onclick="logout()">Logout (အကောင့်မှထွက်မည်)</button>
             </div>
         </div>
@@ -91,8 +79,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
     <script>
+        // Initialization ကို အစီအစဉ်တကျ လုပ်ခြင်း
         const { Client, Account, Databases, ID, Query } = Appwrite;
-        const client = new Client().setEndpoint('https://sgp.cloud.appwrite.io/v1').setProject('6990a457003d6b0bbf82');
+        const client = new Client();
+        client
+            .setEndpoint('https://sgp.cloud.appwrite.io/v1')
+            .setProject('6990a457003d6b0bbf82');
+
         const account = new Account(client);
         const databases = new Databases(client);
 
@@ -104,7 +97,6 @@
         let currentDocId = "";
         let userEmail = "";
 
-        // Sign Up နဲ့ Login ကို တစ်ခါတည်းလုပ်ပေးမယ့် Function
         async function handleAuth() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
@@ -114,21 +106,18 @@
             if(!email || pass.length < 8) return alert("Email နှင့် Password (၈ လုံးအထက်) မှန်အောင်ဖြည့်ပါ။");
             
             btn.classList.add('hidden');
-            loader.classList.remove('hidden');
+            loader.classList.remove('remove');
 
             try {
-                // အရင်ဆုံး အကောင့်အသစ် ဖွင့်ကြည့်မယ်
+                // အရင်ဆုံး Login ကြည့်မယ်
                 try {
+                    await account.createEmailSession(email, pass);
+                } catch (loginError) {
+                    // Login မရရင် အကောင့်အသစ် ဖွင့်ကြည့်မယ်
                     await account.create(ID.unique(), email, pass);
-                } catch (e) {
-                    // အကောင့်ရှိပြီးသားဆိုရင် ဒီအတိုင်း ကျော်သွားမယ်
-                    console.log("Account maybe exists, trying to login...");
+                    await account.createEmailSession(email, pass);
                 }
-                
-                // Login ဝင်မယ်
-                await account.createEmailSession(email, pass);
                 location.reload();
-
             } catch (error) {
                 alert("Error: " + error.message);
                 btn.classList.remove('hidden');
@@ -154,7 +143,9 @@
                     currentDocId = newDoc.$id;
                 }
                 checkInbox();
-            } catch (e) {}
+            } catch (e) {
+                console.log("No active session");
+            }
         }
 
         async function checkInbox() {
@@ -170,15 +161,12 @@
         async function watchAd() {
             const adsLink = 'https://optilinklock.com/1876200';
             window.open(adsLink, '_blank');
-
             const btn = document.getElementById('adBtn');
             const timerDiv = document.getElementById('timer-box');
             const secSpan = document.getElementById('seconds');
-            
             btn.style.display = 'none';
             timerDiv.style.display = 'block';
             let timeLeft = 15;
-
             const countdown = setInterval(async () => {
                 timeLeft--;
                 secSpan.innerText = timeLeft;
@@ -192,7 +180,7 @@
                         await databases.updateDocument(DB_ID, USERS_COL, currentDocId, { balance: newBal });
                         document.getElementById('coinDisplay').innerText = newBal;
                         alert("ဂုဏ်ယူပါတယ်။ 5 Coins ရရှိပါပြီ။");
-                    } catch (e) { alert("Error: Coin ထည့်၍မရပါ။"); }
+                    } catch (e) { alert("Error: Coin တိုး၍မရပါ။"); }
                 }
             }, 1000);
         }
@@ -202,10 +190,8 @@
             const ph = document.getElementById('targetPhone').value;
             const op = document.getElementById('operator').value;
             const currentBal = parseInt(document.getElementById('coinDisplay').innerText);
-
             if (!ph || !amt || amt < 1000) return alert("အနည်းဆုံး ၁၀၀၀ Coins ထုတ်ယူပါ။");
             if (currentBal < amt) return alert("လက်ကျန် Coin မလုံလောက်ပါ။");
-
             try {
                 await databases.createDocument(DB_ID, NOTI_COL, ID.unique(), {
                     message: `💰 ငွေထုတ်ရန်: ${userEmail} မှ ${amt} Coins ကို ${op} (${ph}) ဖြင့် တောင်းဆိုထားသည်။`,
@@ -216,11 +202,13 @@
                 await databases.updateDocument(DB_ID, USERS_COL, currentDocId, { balance: newBal });
                 document.getElementById('coinDisplay').innerText = newBal;
                 alert("ငွေထုတ်တောင်းဆိုမှု အောင်မြင်သည်။ Admin မှ စစ်ဆေးပေးပါမည်။");
-            } catch (e) { alert("Error: Admin Notification စနစ် ချို့ယွင်းနေပါသည်။"); }
+            } catch (e) { alert("Error: ငွေထုတ်ယူမှု မအောင်မြင်ပါ။"); }
         }
 
         async function logout() { await account.deleteSession('current'); location.reload(); }
-        checkSession();
+        
+        // App စတင်ပွင့်ချိန်မှာ Session စစ်ဆေးရန်
+        window.onload = checkSession;
     </script>
 </body>
 </html>
